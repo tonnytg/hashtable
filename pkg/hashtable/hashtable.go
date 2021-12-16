@@ -7,7 +7,7 @@ const (
 var hash = make([]string, 7)
 
 type HashTable struct {
-	table []string
+	table map[int32]string
 }
 
 // Hash loop each letter and return ASCII code, divided by divisorHash
@@ -23,7 +23,7 @@ func Hash(str string) (hash int32){
 func NewHashTable() *HashTable {
 	hash := HashTable{}
 	for i:=0; i < len(hash.table); i++ {
-		hash.table[i] = ""
+		hash.table[int32(i)] = ""
 	}
 	return &hash
 }
