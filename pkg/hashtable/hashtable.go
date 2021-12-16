@@ -1,5 +1,7 @@
 package hashtable
 
+import "fmt"
+
 const (
 	divisorHash = 100
 )
@@ -21,6 +23,7 @@ func Hash(str string) (hash int32){
 }
 
 func NewHashTable(total int) *HashTable {
+	fmt.Println("aqui1")
 	hash := HashTable{}
 	for i:=0; i < total; i++ {
 		hash.table[int32(i)] = ""
@@ -29,6 +32,7 @@ func NewHashTable(total int) *HashTable {
 }
 
 func (h *HashTable) Add(key string, value string) error {
+	fmt.Println("aqui2")
 	hashIndex := Hash(key)
 	h.table[hashIndex] = value
 	return nil
