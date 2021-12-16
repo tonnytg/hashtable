@@ -20,17 +20,18 @@ func Hash(str string) (hash int32){
 	return hash / divisorHash
 }
 
-func NewHashTable() *HashTable {
+func NewHashTable(total int) *HashTable {
 	hash := HashTable{}
-	for i:=0; i < len(hash.table); i++ {
+	for i:=0; i < total; i++ {
 		hash.table[int32(i)] = ""
 	}
 	return &hash
 }
 
-func (h *HashTable) Add(key string, value string) {
+func (h *HashTable) Add(key string, value string) error {
 	hashIndex := Hash(key)
 	h.table[hashIndex] = value
+	return nil
 }
 
 func (h *HashTable) Get(key string) string {
