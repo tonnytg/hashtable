@@ -2,19 +2,6 @@ package main
 
 import "fmt"
 
-func Calc(s string) int {
-	var sum int
-	for _, v := range s {
-		sum += int(v) - '0'
-	}
-	return sum % 7
-}
-
-type Cluster struct {
-	ID int
-	Node *Node
-}
-
 type Node struct {
 	ID int
 	NodeSlot *Slot
@@ -26,38 +13,43 @@ type Slot struct {
 	NextSlot *Slot
 }
 
-var m = make([]Cluster, 7)
-
-func init() {
-	// Cria o slice de cluster
-
-
-	// Alimenta o Cluster com os indices dos Nodes
-	for i := 0; i < 7; i++ {
-		m[i].ID = i
-		m[i].Node = &Node{ID: i}
-	}
+func NewSlot(s *Slot) *Slot{
+	s = &Slot{}
+	return s
 }
 
-func SaveData(v string) {
-	if m[Calc(v)].Node.NodeSlot == nil {
-		m[Calc(v)].Node.NodeSlot = &Slot{ID: Calc(v), Value: v}
+func SaveData(value string, s *Slot) {
+	fmt.Println(s)
+
+	if s == nil {
+		s = NewSlot(s)
+		s.Value = value
+		fmt.Println("true:", s)
 	} else {
-		m[Calc(v)].Node.NodeSlot.NextSlot = &Slot{ID: Calc(v), Value: v}
+		SaveData(value, s.NextSlot)
+		fmt.Println("false:", s)
+		return
 	}
+
+	//if s == nil {
+	//	fmt.Println("Slot is nil")
+	//	s.Value = value
+	//} else {
+	//	if s.NextSlot == nil {
+	//		s.NextSlot = NewSlot(s.NextSlot)
+	//	}
+	//	SaveData(value, s.NextSlot)
+	//}
 }
 
 func main() {
+	n := make([]Node, 3)
+	n[0].ID = 0
+	n[0].NodeSlot = &Slot{0, "a", nil}
+	fmt.Printf("Node: %p\n", n)
+	fmt.Printf("Slot: %p\n", n[0].NodeSlot)
+	SaveData("Teste", n[0].NodeSlot)
+	SaveData("Teste2", n[0].NodeSlot)
 
-	names := []string{"Antonio Thomacelli Gomes", "Antonio Thomacelli Gomez"}
 
-	for _, v := range names {
-		// Cria o primeiro Slot e se estiver ocupado joga para o próximo
-		SaveData(v)
-
-		fmt.Printf("Valor: %s\nSalvo no Cluster: %v\t\t " +
-			"Node:%v\t\t Slot: %v\n", v, Calc(v), m[Calc(v)].Node.ID, m[Calc(v)].Node.NodeSlot.ID)
-		fmt.Println(m[Calc(v)].Node.NodeSlot)
-		fmt.Println("---")
-	}
 }
