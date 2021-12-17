@@ -2,54 +2,111 @@ package main
 
 import "fmt"
 
-type Node struct {
-	ID int
-	NodeSlot *Slot
+const ArraySize = 7
+
+type HashTable struct {
+	array [ArraySize]*bucket
 }
 
-type Slot struct {
-	ID int
-	Value string
-	NextSlot *Slot
+type bucket struct {
+	head *bucketNode
 }
 
-func NewSlot(s *Slot) *Slot{
-	s = &Slot{}
-	return s
+type bucketNode struct {
+	key string
+	next *bucketNode
 }
 
-func SaveData(value string, s *Slot) {
-	fmt.Println(s)
+func hash(key string ) int {
+	sum := 0
+	for _, v := range key {
+		sum += int(v)
+	}
+	return sum % ArraySize
+}
 
-	if s == nil {
-		s = NewSlot(s)
-		s.Value = value
-		fmt.Println("true:", s)
+func (h *HashTable) Insert(key string) {
+	index := hash(key)
+	h.array[index].insert(key)
+}
+
+func (h *HashTable) Search(key string) bool {
+	index := hash(key)
+	return h.array[index].search(key)
+}
+
+func (h *HashTable) Delete(key string) {
+	index := hash(key)
+	h.array[index].delete(key)
+}
+
+func (b *bucket) insert(k string) {
+	if !b.search(k) {
+		newNode:= &bucketNode{key: k}
+		newNode.next = b.head
+		b.head = newNode
 	} else {
-		SaveData(value, s.NextSlot)
-		fmt.Println("false:", s)
+		fmt.Println(k, " already exists")
+	}
+}
+
+func (b *bucket) search(k string) bool {
+	currentNode := b.head
+	for currentNode != nil {
+		if currentNode.key == k {
+			return true
+		}
+		currentNode = currentNode.next
+	}
+	return false
+}
+
+func (b *bucket) delete(k string) {
+
+	if b.head.key == k {
+		b.head = b.head.next
 		return
 	}
 
-	//if s == nil {
-	//	fmt.Println("Slot is nil")
-	//	s.Value = value
-	//} else {
-	//	if s.NextSlot == nil {
-	//		s.NextSlot = NewSlot(s.NextSlot)
-	//	}
-	//	SaveData(value, s.NextSlot)
-	//}
+	previousNode := b.head
+	for previousNode.next != nil {
+		if previousNode.next.key == k {
+			// delete
+			previousNode.next = previousNode.next.next
+		}
+		previousNode = previousNode.next
+	}
+}
+
+// Init inicializa a array com conteúdo
+func Init() *HashTable {
+	result := &HashTable{}
+	for i := 0; i < ArraySize; i++ {
+		result.array[i] = &bucket{}
+	}
+	return result
 }
 
 func main() {
-	n := make([]Node, 3)
-	n[0].ID = 0
-	n[0].NodeSlot = &Slot{0, "a", nil}
-	fmt.Printf("Node: %p\n", n)
-	fmt.Printf("Slot: %p\n", n[0].NodeSlot)
-	SaveData("Teste", n[0].NodeSlot)
-	SaveData("Teste2", n[0].NodeSlot)
 
+	hashTable := Init()
+	names := []string {
+		"ERIC",
+		"KENNY",
+		"KYLE",
+		"STAN",
+		"RANDY",
+		"BUTTERS",
+		"TOKEN",
+	}
+
+	for _, v := range names {
+		hashTable.Insert(v)
+	}
+
+	hashTable.Delete("STAN")
+	hashTable.Search("STAN")
+	hashTable.Insert("STAN")
+	hashTable.Search("STAN")
 
 }
