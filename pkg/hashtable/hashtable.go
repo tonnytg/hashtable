@@ -2,49 +2,90 @@ package hashtable
 
 import "fmt"
 
-const (
-	divisorHash = 100
-)
-
-var hash = make([]string, 7)
+const ArraySize = 7
 
 type HashTable struct {
-	table map[int32]string
+	array [ArraySize]*bucket
 }
 
-// Hash loop each letter and return ASCII code, divided by divisorHash
-// return will be used like indices for the array
-func Hash(str string) (hash int32){
-	for _, v := range str {
-		hash +=v
+type bucket struct {
+	head *bucketNode
+}
+
+type bucketNode struct {
+	key string
+	next *bucketNode
+}
+
+// Init inicializa a array com conteúdo
+func Init() *HashTable {
+	result := &HashTable{}
+	for i := 0; i < ArraySize; i++ {
+		result.array[i] = &bucket{}
 	}
-	// return hash % divisorHash
-	return hash / divisorHash
+	return result
 }
 
-func NewHashTable(total int) *HashTable {
-	fmt.Println("aqui1")
-	hash := HashTable{}
-	for i:=0; i < total; i++ {
-		hash.table[int32(i)] = ""
+func hash(key string ) int {
+	sum := 0
+	for _, v := range key {
+		sum += int(v)
 	}
-	return &hash
+	return sum % ArraySize
 }
 
-func (h *HashTable) Add(key string, value string) error {
-	fmt.Println("aqui2")
-	hashIndex := Hash(key)
-	h.table[hashIndex] = value
-	return nil
+func (h *HashTable) Insert(key string) {
+	index := hash(key)
+	h.array[index].insert(key)
 }
 
-func (h *HashTable) Get(key string) string {
-	hashIndex := Hash(key)
-	return h.table[hashIndex]
+func (h *HashTable) Search(key string) bool {
+	index := hash(key)
+	return h.array[index].search(key)
 }
 
-func (h *HashTable) Remove(key string) {
-	hashIndex := Hash(key)
-	h.table[hashIndex] = ""
+func (h *HashTable) Delete(key string) {
+	index := hash(key)
+	h.array[index].delete(key)
 }
+
+func (b *bucket) insert(k string) {
+	if !b.search(k) {
+		newNode:= &bucketNode{key: k}
+		newNode.next = b.head
+		b.head = newNode
+	} else {
+		fmt.Println(k, " already exists")
+	}
+}
+
+func (b *bucket) search(k string) bool {
+	currentNode := b.head
+	for currentNode != nil {
+		if currentNode.key == k {
+			return true
+		}
+		currentNode = currentNode.next
+	}
+	return false
+}
+
+func (b *bucket) delete(k string) {
+
+	if b.head.key == k {
+		b.head = b.head.next
+		return
+	}
+
+	previousNode := b.head
+	for previousNode.next != nil {
+		if previousNode.next.key == k {
+			// delete
+			previousNode.next = previousNode.next.next
+		}
+		previousNode = previousNode.next
+	}
+}
+
+
 
